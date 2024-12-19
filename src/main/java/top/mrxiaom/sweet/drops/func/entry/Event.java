@@ -4,9 +4,11 @@ import org.apache.commons.lang.math.DoubleRange;
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.permissions.Permissible;
 import top.mrxiaom.pluginbase.utils.Util;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Event {
     public final String id;
@@ -28,6 +30,18 @@ public class Event {
         this.items = items;
         this.fortuneRounding = fortuneRounding;
         this.fortuneMultiples = fortuneMultiples;
+    }
+
+    public boolean needToInv(Permissible permissible) {
+        return permToInventory != null && permissible.hasPermission(permToInventory);
+    }
+
+    public double randomFortuneMultipler(int fortune) {
+        DoubleRange range = fortuneMultiples.get(fortune);
+        if (range == null) return 1.0;
+        double rand = new Random().nextInt(1919810) / 1919809.0;
+        double len = range.getMaximumDouble() - range.getMinimumDouble();
+        return range.getMinimumDouble() + rand * len;
     }
 
     public static Event load(ConfigurationSection config, String id) {

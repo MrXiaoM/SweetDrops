@@ -1,11 +1,25 @@
 package top.mrxiaom.sweet.drops.func;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.SweetDrops;
 import top.mrxiaom.sweet.drops.func.entry.Event;
+import top.mrxiaom.sweet.drops.func.entry.IDropItem;
 
 import java.io.File;
 import java.util.*;
@@ -70,6 +84,68 @@ public class EventsManager extends AbstractModule {
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
                 Event loaded = Event.load(config, id);
                 eventsById.put(id, loaded);
+            }
+        }
+    }
+
+    @Nullable
+    public List<Event> get(Block block) {
+        Map<Material, List<Event>> map = eventsByWorld.get(block.getWorld().getName());
+        return map == null ? null : map.get(block.getType());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockBreak(BlockBreakEvent e) {
+        if (e.isCancelled()) return;
+        Player player = e.getPlayer();
+        Block block = e.getBlock();
+        List<Event> events = get(block);
+        if (events == null) return;
+        PlayerInventory inv = player.getInventory();
+        ItemStack mainHand = inv.getItemInMainHand();
+        int fortune;
+        if (block.isPreferredTool(mainHand)) {
+            ItemMeta meta = mainHand.getItemMeta();
+            if (meta != null) {
+                fortune = meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS);
+            } else {
+                fortune = 0;
+            }
+        } else {
+            fortune = 0;
+        }
+        for (Event event : events) {
+            if (event.cancelAll) {
+                e.setDropItems(false);
+                e.setExpToDrop(0);
+            }
+            boolean toInv = event.needToInv(player);
+            for (IDropItem item : event.items) {
+                if (item.checkRate()) {
+                    double multipler = event.randomFortuneMultipler(fortune);
+                    List<ItemStack> list = item.generateItems(player, multipler);
+                    if (list != null) {
+                        List<ItemStack> dropItems = new ArrayList<>();
+                        if (toInv) {
+                            for (ItemStack itemStack : list) {
+                                Collection<ItemStack> last = inv.addItem(itemStack).values();
+                                dropItems.addAll(last);
+                            }
+                        } else {
+                            dropItems.addAll(list);
+                        }
+                        if (!dropItems.isEmpty()) {
+                            World world = block.getWorld();
+                            Location loc = block.getLocation().clone().add(0, 0.5, 0);
+                            for (ItemStack dropItem : dropItems) {
+                                world.dropItem(loc, dropItem);
+                            }
+                        }
+                    }
+                    if (item.isEnd()) {
+                        break;
+                    }
+                }
             }
         }
     }

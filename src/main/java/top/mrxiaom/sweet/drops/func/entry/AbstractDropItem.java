@@ -24,6 +24,11 @@ public abstract class AbstractDropItem implements IDropItem {
     }
 
     @Override
+    public boolean isEnd() {
+        return end;
+    }
+
+    @Override
     public List<ItemStack> generateItems(Player player, double multiple) {
         int i = amount.getMaximumInteger() - amount.getMinimumInteger() + 1;
         int finalAmount = amount.getMinimumInteger() + new Random().nextInt(i);
