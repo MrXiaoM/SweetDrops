@@ -24,6 +24,10 @@ public class EventsManager extends AbstractModule {
         eventsById.clear();
         for (String s : folders) {
             File folder = s.startsWith("./") ? new File(plugin.getDataFolder(), s.substring(2)) : new File(s);
+            if (s.equals("./events") && !folder.exists()) {
+                Util.mkdirs(folder);
+                plugin.saveResource("events/example.yml", new File(folder, "example.yml"));
+            }
             if (folder.isDirectory() && !new File(folder, ".ignore").exists()) {
                 reloadConfig(folder);
             }
