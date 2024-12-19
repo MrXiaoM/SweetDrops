@@ -53,6 +53,15 @@ tasks {
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
         }
+        listOf(
+            "top/mrxiaom/pluginbase/func/AbstractGui*",
+            "top/mrxiaom/pluginbase/func/gui/*",
+            "top/mrxiaom/pluginbase/utils/IA*",
+            "top/mrxiaom/pluginbase/utils/ItemStackUtil*",
+            "top/mrxiaom/pluginbase/func/GuiManager*",
+            "top/mrxiaom/pluginbase/gui/*",
+            "top/mrxiaom/pluginbase/utils/Bytes*",
+        ).forEach(this::exclude)
     }
     build {
         dependsOn(shadowJar)
