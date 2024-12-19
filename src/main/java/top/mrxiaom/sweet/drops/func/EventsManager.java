@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.drops.func;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -98,6 +99,8 @@ public class EventsManager extends AbstractModule {
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
         Player player = e.getPlayer();
+        GameMode gameMode = player.getGameMode();
+        if (!gameMode.equals(GameMode.SURVIVAL) && !gameMode.equals(GameMode.ADVENTURE)) return;
         Block block = e.getBlock();
         List<Event> events = get(block);
         if (events == null) return;
