@@ -1,0 +1,11 @@
+name: SweetDrops
+version: '${version}'
+main: top.mrxiaom.sweet.drops.SweetDrops
+api-version: 1.13
+depend: [ MythicMobs ]
+softdepend: [ PlaceholderAPI ]
+authors: [ MrXiaoM ]
+commands:
+  sweetdrops:
+    description: 'The main command of SweetDrops'
+    aliases: [ sdrops, sd ]
