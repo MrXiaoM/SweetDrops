@@ -34,6 +34,7 @@ dependencies {
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("org.jetbrains:annotations:21.0.0")
+    implementation("commons-lang:commons-lang:2.6")
     implementation("top.mrxiaom:PluginBase:1.0.9")
 }
 java {
@@ -49,6 +50,7 @@ tasks {
             "org.intellij.lang.annotations" to "annotations.intellij",
             "org.jetbrains.annotations" to "annotations.jetbrains",
             "top.mrxiaom.pluginbase" to "base",
+            "org.apache.commons" to "commons",
             "net.kyori" to "kyori",
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
