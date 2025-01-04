@@ -7,6 +7,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.permissions.Permissible;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.func.entry.drop.IDropItem;
+import top.mrxiaom.sweet.drops.func.entry.item.IMatcher;
+import top.mrxiaom.sweet.drops.func.entry.item.MatchMMO;
+import top.mrxiaom.sweet.drops.func.entry.item.MatchMythic;
+import top.mrxiaom.sweet.drops.func.entry.item.MatchVanilla;
 import top.mrxiaom.sweet.drops.func.entry.round.IRound;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundCeil;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundFloor;
@@ -18,16 +22,19 @@ public class Event {
     public final String id;
     public final Set<String> worlds;
     public final Set<Material> blocks;
-    public final boolean cancelAll,cancelIfDropAny;
+    public final List<IMatcher> tools;
+    public final boolean cancelAll,cancelIfDropAny, requirePreferredTool;
     public final String permToInventory;
     public final List<IDropItem> items;
     public final IRound fortuneRounding;
     public final Map<Integer, DoubleRange> fortuneMultiples;
 
-    Event(String id, Set<String> worlds, Set<Material> blocks, boolean cancelAll, boolean cancelIfDropAny, String permToInventory, List<IDropItem> items, IRound fortuneRounding, Map<Integer, DoubleRange> fortuneMultiples) {
+    Event(String id, Set<String> worlds, Set<Material> blocks, List<IMatcher> tools, boolean requirePreferredTool, boolean cancelAll, boolean cancelIfDropAny, String permToInventory, List<IDropItem> items, IRound fortuneRounding, Map<Integer, DoubleRange> fortuneMultiples) {
         this.id = id;
         this.worlds = worlds;
         this.blocks = blocks;
+        this.tools = tools;
+        this.requirePreferredTool = requirePreferredTool;
         this.cancelAll = cancelAll;
         this.cancelIfDropAny = cancelIfDropAny;
         this.permToInventory = permToInventory;
@@ -58,8 +65,30 @@ public class Event {
                 blocks.add(material);
             }
         }
-        boolean cancelAll = config.getBoolean("cancel.all"),
-                cancelIfDropAny = config.getBoolean("cancel.if-drop-any");
+        List<IMatcher> tools = new ArrayList<>();
+        for (String s : config.getStringList("tools")) {
+            if (s.startsWith("mythic:")) {
+                String mythicItem = s.substring(7);
+                tools.add(new MatchMythic(mythicItem));
+                continue;
+            }
+            if (s.startsWith("mmo:")) {
+                String[] split = s.substring(4).split(":", 2);
+                if (split.length != 2) continue;
+                String type = split[0];
+                String itemId = split[1];
+                tools.add(new MatchMMO(type, itemId));
+                continue;
+            }
+            Material material = Util.valueOr(Material.class, s, null);
+            if (material != null) {
+                tools.add(new MatchVanilla(material));
+                continue;
+            }
+        }
+        boolean requirePreferredTool = config.getBoolean("require-preferred-tool", false),
+                cancelAll = config.getBoolean("cancel.all", false),
+                cancelIfDropAny = config.getBoolean("cancel.if-drop-any", false);
         String permToInventory = config.getString("perm-to-inventory");
         List<IDropItem> items = new ArrayList<>();
         for (String s : config.getStringList("items")) {
@@ -88,7 +117,7 @@ public class Event {
             DoubleRange multipler = getDoubleRange(section.getString(key)).orElseGet(() -> new DoubleRange(1.0));
             multiples.put(level, multipler);
         }
-        return new Event(id, worlds, blocks, cancelAll, cancelIfDropAny, permToInventory, items, rounding, multiples);
+        return new Event(id, worlds, blocks, tools, requirePreferredTool, cancelAll, cancelIfDropAny, permToInventory, items, rounding, multiples);
     }
 
     public static Optional<IntRange> getIntRange(String s) {

@@ -21,6 +21,7 @@ import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.SweetDrops;
 import top.mrxiaom.sweet.drops.func.entry.Event;
 import top.mrxiaom.sweet.drops.func.entry.drop.IDropItem;
+import top.mrxiaom.sweet.drops.func.entry.item.IMatcher;
 
 import java.io.File;
 import java.util.*;
@@ -105,9 +106,10 @@ public class EventsManager extends AbstractModule {
         List<Event> events = get(block);
         if (events == null) return;
         PlayerInventory inv = player.getInventory();
-        ItemStack mainHand = inv.getItemInMainHand();
+        ItemStack mainHand = inv.getItemInHand();
         int fortune;
-        if (block.isPreferredTool(mainHand)) {
+        boolean preferredTool = block.isPreferredTool(mainHand);
+        if (preferredTool) {
             ItemMeta meta = mainHand.getItemMeta();
             if (meta != null) {
                 fortune = meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS);
@@ -118,6 +120,19 @@ public class EventsManager extends AbstractModule {
             fortune = 0;
         }
         for (Event event : events) {
+            if (event.requirePreferredTool && !preferredTool) {
+                continue;
+            }
+            boolean matchTool = event.tools.isEmpty();
+            for (IMatcher tool : event.tools) {
+                if (tool.match(mainHand)) {
+                    matchTool = true;
+                    break;
+                }
+            }
+            if (!matchTool) {
+                continue;
+            }
             if (event.cancelAll) {
                 e.setDropItems(false);
                 e.setExpToDrop(0);

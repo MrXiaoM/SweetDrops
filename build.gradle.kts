@@ -35,6 +35,7 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("org.jetbrains:annotations:21.0.0")
     implementation("commons-lang:commons-lang:2.6")
+    implementation("de.tr7zw:item-nbt-api:2.14.1")
     implementation("top.mrxiaom:PluginBase:1.0.9")
 }
 java {
@@ -50,6 +51,7 @@ tasks {
             "org.intellij.lang.annotations" to "annotations.intellij",
             "org.jetbrains.annotations" to "annotations.jetbrains",
             "top.mrxiaom.pluginbase" to "base",
+            "de.tr7zw.changeme.nbtapi" to "nbtapi",
             "org.apache.commons" to "commons",
             "net.kyori" to "kyori",
         ).forEach { (original, target) ->
