@@ -121,6 +121,9 @@ public class EventsManager extends AbstractModule {
         }
         for (Event event : events) {
             if (event.requirePreferredTool && !preferredTool) {
+                if (plugin.debug && player.isOp()) {
+                    t(player, "[挖掘事件][" + event.id + "][" + block.getType().name().toUpperCase() + "] 工具不合适 &7(require-preferred-tool)");
+                }
                 continue;
             }
             boolean matchTool = event.tools.isEmpty();
@@ -131,6 +134,9 @@ public class EventsManager extends AbstractModule {
                 }
             }
             if (!matchTool) {
+                if (plugin.debug && player.isOp()) {
+                    t(player, "[挖掘事件][" + event.id + "][" + block.getType().name().toUpperCase() + "] 工具不匹配 &7(tools)");
+                }
                 continue;
             }
             if (event.cancelAll) {

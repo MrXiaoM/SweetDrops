@@ -27,13 +27,17 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             plugin.reloadConfig();
             return t(sender, "&a配置文件已重载");
         }
+        if (args.length == 1 && "debug".equalsIgnoreCase(args[0]) && sender.isOp()) {
+            plugin.debug = !plugin.debug;
+            return t(sender, "&f调试模式已" + (plugin.debug ? "&a开启" : "&c关闭"));
+        }
         return true;
     }
 
     private static final List<String> emptyList = Lists.newArrayList();
     private static final List<String> listArg0 = Lists.newArrayList();
     private static final List<String> listOpArg0 = Lists.newArrayList(
-            "reload");
+            "debug", "reload");
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {

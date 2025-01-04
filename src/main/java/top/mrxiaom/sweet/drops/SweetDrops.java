@@ -24,6 +24,7 @@ public class SweetDrops extends BukkitPlugin {
                 .scanIgnore("top.mrxiaom.sweet.drops.libs")
         );
     }
+    public static boolean debug = false;
     IMythic mythic;
 
     public IMythic getMythic() {
