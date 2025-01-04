@@ -20,7 +20,7 @@ import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.SweetDrops;
 import top.mrxiaom.sweet.drops.func.entry.Event;
-import top.mrxiaom.sweet.drops.func.entry.IDropItem;
+import top.mrxiaom.sweet.drops.func.entry.drop.IDropItem;
 
 import java.io.File;
 import java.util.*;

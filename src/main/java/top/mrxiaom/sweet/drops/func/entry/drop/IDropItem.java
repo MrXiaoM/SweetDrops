@@ -1,4 +1,4 @@
-package top.mrxiaom.sweet.drops.func.entry;
+package top.mrxiaom.sweet.drops.func.entry.drop;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

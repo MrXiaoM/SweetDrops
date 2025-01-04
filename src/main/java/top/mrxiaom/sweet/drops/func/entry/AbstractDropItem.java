@@ -3,6 +3,7 @@ package top.mrxiaom.sweet.drops.func.entry;
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import top.mrxiaom.sweet.drops.func.entry.drop.IDropItem;
 
 import java.util.List;
 import java.util.Random;

@@ -1,10 +1,10 @@
-package top.mrxiaom.sweet.drops.func.entry;
+package top.mrxiaom.sweet.drops.func.entry.drop;
 
 import org.apache.commons.lang.math.IntRange;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.sweet.drops.SweetDrops;
+import top.mrxiaom.sweet.drops.func.entry.AbstractDropItem;
 import top.mrxiaom.sweet.drops.mythic.IMythic;
 
 import java.util.ArrayList;
