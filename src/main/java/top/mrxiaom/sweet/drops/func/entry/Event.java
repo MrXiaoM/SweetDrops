@@ -23,17 +23,19 @@ public class Event {
     public final Set<String> worlds;
     public final Set<Material> blocks;
     public final List<IMatcher> tools;
+    public final Map<String, Integer> enchantments;
     public final boolean cancelAll,cancelIfDropAny, requirePreferredTool;
     public final String permToInventory;
     public final List<IDropItem> items;
     public final IRound fortuneRounding;
     public final Map<Integer, DoubleRange> fortuneMultiples;
 
-    Event(String id, Set<String> worlds, Set<Material> blocks, List<IMatcher> tools, boolean requirePreferredTool, boolean cancelAll, boolean cancelIfDropAny, String permToInventory, List<IDropItem> items, IRound fortuneRounding, Map<Integer, DoubleRange> fortuneMultiples) {
+    Event(String id, Set<String> worlds, Set<Material> blocks, List<IMatcher> tools, Map<String, Integer> enchantments, boolean requirePreferredTool, boolean cancelAll, boolean cancelIfDropAny, String permToInventory, List<IDropItem> items, IRound fortuneRounding, Map<Integer, DoubleRange> fortuneMultiples) {
         this.id = id;
         this.worlds = worlds;
         this.blocks = blocks;
         this.tools = tools;
+        this.enchantments = enchantments;
         this.requirePreferredTool = requirePreferredTool;
         this.cancelAll = cancelAll;
         this.cancelIfDropAny = cancelIfDropAny;
@@ -86,6 +88,13 @@ public class Event {
                 continue;
             }
         }
+        Map<String, Integer> enchantments = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (String s : config.getStringList("enchantments")) {
+            String[] split = s.split(":", 2);
+            String enchant = split[0];
+            int level = split.length == 1 ? 0 : Math.max(0, Util.parseInt(split[1]).orElse(0));
+            enchantments.put(enchant, level);
+        }
         boolean requirePreferredTool = config.getBoolean("require-preferred-tool", false),
                 cancelAll = config.getBoolean("cancel.all", false),
                 cancelIfDropAny = config.getBoolean("cancel.if-drop-any", false);
@@ -117,7 +126,7 @@ public class Event {
             DoubleRange multipler = getDoubleRange(section.getString(key)).orElseGet(() -> new DoubleRange(1.0));
             multiples.put(level, multipler);
         }
-        return new Event(id, worlds, blocks, tools, requirePreferredTool, cancelAll, cancelIfDropAny, permToInventory, items, rounding, multiples);
+        return new Event(id, worlds, blocks, tools, enchantments, requirePreferredTool, cancelAll, cancelIfDropAny, permToInventory, items, rounding, multiples);
     }
 
     public static Optional<IntRange> getIntRange(String s) {

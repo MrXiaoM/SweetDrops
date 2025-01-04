@@ -119,6 +119,8 @@ public class EventsManager extends AbstractModule {
         } else {
             fortune = 0;
         }
+        ItemMeta meta = mainHand.getItemMeta();
+        Map<Enchantment, Integer> enchants = meta == null ? null : meta.getEnchants();
         for (Event event : events) {
             if (event.requirePreferredTool && !preferredTool) {
                 if (plugin.debug && player.isOp()) {
@@ -139,6 +141,32 @@ public class EventsManager extends AbstractModule {
                 }
                 continue;
             }
+            if (!event.enchantments.isEmpty()) {
+                boolean matchEnchant = true;
+                for (Map.Entry<String, Integer> entry : event.enchantments.entrySet()) {
+                    boolean match = false;
+                    for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
+                        String key = enchant.getKey().getKey().getKey();
+                        if (entry.getKey().equalsIgnoreCase(key)) {
+                            int requireLevel = entry.getValue();
+                            match = requireLevel == 0 || enchant.getValue() >= requireLevel;
+
+                            break;
+                        }
+                    }
+                    if (!match) {
+                        if (plugin.debug && player.isOp()) {
+                            t(player, "[挖掘事件][" + event.id + "][" + block.getType().name().toUpperCase() + "] 附魔不匹配 &7(enchantments)&f: " + entry.getKey());
+                        }
+                        matchEnchant = false;
+                        break;
+                    }
+                }
+                if (!matchEnchant) {
+                    continue;
+                }
+            }
+
             if (event.cancelAll) {
                 e.setDropItems(false);
                 e.setExpToDrop(0);
