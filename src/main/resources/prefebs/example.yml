@@ -1,0 +1,25 @@
+# 物品材质。除了此项以外，其它选项全部可选
+material: DIAMOND
+# 扁平化前的旧版本使用
+data: 0
+# 物品名
+name: '<blue>预制体'
+# 物品描述
+lore:
+  - '<white>用于测试的预制体'
+  - '&f可使用 MiniMessage 格式和 PAPI 变量&7(变量不会刷新)'
+# 皮革套装颜色
+color: '#EFEFEF'
+# 附魔列表
+enchantments:
+  sharpness: 1
+# 可选，物品 CustomModelData
+custom_model_data: 10000
+# 该物品是否不可堆叠，开启此选项，将会在NBT添加一个UUID，防止物品堆叠
+unique: false
+# 物品特定nbt标签，均支持 PAPI
+nbt_strings:
+  ITEM_TYPE: 'awa'
+nbt_ints:
+  ITEM_ID: 6
+  ITEM_ID_ALT: '7'

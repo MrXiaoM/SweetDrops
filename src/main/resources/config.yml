@@ -1,3 +1,6 @@
-
+# events 文件夹路径，方便同机器多服同步使用
 events-folders:
   - './events'
+# prefebs 文件夹路径，方便同机器多服同步使用
+prefebs-folders:
+  - './prefebs'

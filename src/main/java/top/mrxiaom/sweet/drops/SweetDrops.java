@@ -2,10 +2,12 @@ package top.mrxiaom.sweet.drops;
         
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.EconomyHolder;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.mythic.IMythic;
 import top.mrxiaom.sweet.drops.mythic.Mythic4;
 import top.mrxiaom.sweet.drops.mythic.Mythic5;
@@ -26,7 +28,12 @@ public class SweetDrops extends BukkitPlugin {
         );
     }
     public static boolean debug = false;
+    private static boolean supportNamespacedKeys = Util.isPresent("org.bukkit.NamespacedKey");
     IMythic mythic;
+
+    public static boolean isSupportNamespacedKeys() {
+        return supportNamespacedKeys;
+    }
 
     public IMythic getMythic() {
         return mythic;
