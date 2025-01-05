@@ -11,6 +11,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -27,11 +28,12 @@ import java.io.File;
 import java.util.*;
 
 @AutoRegister
-public class EventsManager extends AbstractModule {
+public class EventsManager extends AbstractModule implements Listener {
     final Map<String, Event> eventsById = new HashMap<>();
     final Map<String, Map<Material, List<Event>>> eventsByWorld = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     public EventsManager(SweetDrops plugin) {
         super(plugin);
+        registerEvents();
     }
 
     @Override
