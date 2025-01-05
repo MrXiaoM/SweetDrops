@@ -10,9 +10,7 @@ import top.mrxiaom.sweet.drops.func.entry.Event;
 import top.mrxiaom.sweet.drops.func.entry.Prefeb;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @AutoRegister
 public class PrefebManager extends AbstractModule {
@@ -59,6 +57,10 @@ public class PrefebManager extends AbstractModule {
                 }
             }
         }
+    }
+
+    public Set<String> prefebs() {
+        return prefebsById.keySet();
     }
 
     @Nullable

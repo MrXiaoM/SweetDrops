@@ -25,8 +25,12 @@ public class DropPrefeb extends AbstractDropItem {
 
     @Override
     public List<ItemStack> getItems(Player player, int amount) {
-        List<ItemStack> items = new ArrayList<>();
         Prefeb prefeb = PrefebManager.inst().get(id);
+        return getItems(player, prefeb, amount);
+    }
+
+    public static List<ItemStack> getItems(Player player, Prefeb prefeb, int amount) {
+        List<ItemStack> items = new ArrayList<>();
         if (prefeb != null) {
             if (prefeb.unique) for (int i = 0; i < amount; i++) {
                 items.add(prefeb.generate(player));
