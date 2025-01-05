@@ -8,9 +8,18 @@ import top.mrxiaom.sweet.drops.func.entry.AbstractDropItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import static top.mrxiaom.sweet.drops.SweetDrops.format;
+
 public class DropPrefeb extends AbstractDropItem {
-    protected DropPrefeb(double rate, IntRange amount, boolean end) {
+    public final String id;
+    public DropPrefeb(double rate, String id, IntRange amount, boolean end) {
         super(rate, amount, end);
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "prefeb " + rate + " " + id + " " + format(amount) + (end ? " end" : "");
     }
 
     @Override

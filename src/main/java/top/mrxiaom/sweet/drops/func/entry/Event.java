@@ -6,6 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.permissions.Permissible;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.drops.func.entry.drop.DropMythic;
+import top.mrxiaom.sweet.drops.func.entry.drop.DropPrefeb;
+import top.mrxiaom.sweet.drops.func.entry.drop.DropVanilla;
 import top.mrxiaom.sweet.drops.func.entry.drop.IDropItem;
 import top.mrxiaom.sweet.drops.func.entry.item.IMatcher;
 import top.mrxiaom.sweet.drops.func.entry.item.MatchMMO;
@@ -112,6 +115,21 @@ public class Event {
             String item = split[2];
             IntRange amount = getIntRange(split.length >= 4 ? split[3] : null).orElseGet(() -> new IntRange(1));
             boolean end = split.length >= 5 && split[4].equals("end");
+            if (type.equalsIgnoreCase("mc")) {
+                Material material = Util.valueOr(Material.class, item, null);
+                if (material != null) {
+                    items.add(new DropVanilla(rate, material, amount, end));
+                    continue;
+                }
+            }
+            if (type.equalsIgnoreCase("prefeb")) {
+                items.add(new DropPrefeb(rate, item, amount, end));
+                continue;
+            }
+            if (type.equalsIgnoreCase("mythic")) {
+                items.add(new DropMythic(rate, item, amount, end));
+                continue;
+            }
         }
         String roundingType = config.getString("fortune.rounding", "");
         IRound rounding;

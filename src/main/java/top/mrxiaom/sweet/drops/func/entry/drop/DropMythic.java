@@ -10,16 +10,18 @@ import top.mrxiaom.sweet.drops.mythic.IMythic;
 import java.util.ArrayList;
 import java.util.List;
 
+import static top.mrxiaom.sweet.drops.SweetDrops.format;
+
 public class DropMythic extends AbstractDropItem {
     public final String id;
-    protected DropMythic(double rate, String id, IntRange amount, boolean end) {
+    public DropMythic(double rate, String id, IntRange amount, boolean end) {
         super(rate, amount, end);
         this.id = id;
     }
 
     @Override
     public String toString() {
-        return "mythic " + rate + " " + id + (end ? " end" : "");
+        return "mythic " + rate + " " + id + " " + format(amount) + (end ? " end" : "");
     }
 
     @Override

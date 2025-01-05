@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.drops;
         
+import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -53,5 +54,12 @@ public class SweetDrops extends BukkitPlugin {
     @Override
     protected void afterEnable() {
         getLogger().info("SweetDrops 加载完毕");
+    }
+
+    public static String format(IntRange range) {
+        int min = range.getMinimumInteger();
+        int max = range.getMaximumInteger();
+        if (min == max) return String.valueOf(min);
+        return min + "-" + max;
     }
 }

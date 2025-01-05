@@ -9,16 +9,18 @@ import top.mrxiaom.sweet.drops.func.entry.AbstractDropItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import static top.mrxiaom.sweet.drops.SweetDrops.format;
+
 public class DropVanilla extends AbstractDropItem {
     public final Material material;
-    protected DropVanilla(double rate, Material material, IntRange amount, boolean end) {
+    public DropVanilla(double rate, Material material, IntRange amount, boolean end) {
         super(rate, amount, end);
         this.material = material;
     }
 
     @Override
     public String toString() {
-        return "mc " + rate + " " + material.name() + (end ? " end" : "");
+        return "mc " + rate + " " + material.name() + " " + format(amount) + (end ? " end" : "");
     }
 
     @Override
