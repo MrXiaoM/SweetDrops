@@ -17,6 +17,11 @@ public class DropVanilla extends AbstractDropItem {
     }
 
     @Override
+    public String toString() {
+        return "mc " + rate + " " + material.name() + (end ? " end" : "");
+    }
+
+    @Override
     public List<ItemStack> getItems(Player player, int amount) {
         List<ItemStack> items = new ArrayList<>();
         int maxSize = material.getMaxStackSize();

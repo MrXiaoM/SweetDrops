@@ -119,12 +119,18 @@ public class EventsManager extends AbstractModule {
         } else {
             fortune = 0;
         }
+        if (plugin.debug && player.isOp()) {
+            t(player, "[挖掘方块][" + block.getType() + "] 有事件 " + events.size() + " 个，时运等级: " + fortune);
+        }
         ItemMeta meta = mainHand.getItemMeta();
         Map<Enchantment, Integer> enchants = meta == null ? null : meta.getEnchants();
         for (Event event : events) {
+            if (plugin.debug && player.isOp()) {
+                t(player, "  处理事件 " + event.id);
+            }
             if (event.requirePreferredTool && !preferredTool) {
                 if (plugin.debug && player.isOp()) {
-                    t(player, "[挖掘事件][" + event.id + "][" + block.getType().name().toUpperCase() + "] 工具不合适 &7(require-preferred-tool)");
+                    t(player, "    工具不合适 &7(require-preferred-tool)");
                 }
                 continue;
             }
@@ -137,7 +143,7 @@ public class EventsManager extends AbstractModule {
             }
             if (!matchTool) {
                 if (plugin.debug && player.isOp()) {
-                    t(player, "[挖掘事件][" + event.id + "][" + block.getType().name().toUpperCase() + "] 工具不匹配 &7(tools)");
+                    t(player, "    工具不匹配 &7(tools)");
                 }
                 continue;
             }
@@ -156,7 +162,7 @@ public class EventsManager extends AbstractModule {
                     }
                     if (!match) {
                         if (plugin.debug && player.isOp()) {
-                            t(player, "[挖掘事件][" + event.id + "][" + block.getType().name().toUpperCase() + "] 附魔不匹配 &7(enchantments)&f: " + entry.getKey());
+                            t(player, "    附魔不匹配 &7(enchantments)&f: " + entry.getKey());
                         }
                         matchEnchant = false;
                         break;
@@ -166,17 +172,24 @@ public class EventsManager extends AbstractModule {
                     continue;
                 }
             }
-
+            if (plugin.debug && player.isOp()) {
+                t(player, "    &f一切条件&a匹配&f，正在进行判定");
+            }
             if (event.cancelAll) {
                 e.setDropItems(false);
                 e.setExpToDrop(0);
             }
             boolean toInv = event.needToInv(player);
             for (IDropItem item : event.items) {
-                if (item.checkRate()) {
+                boolean success = item.checkRate();
+
+                if (plugin.debug && player.isOp()) {
+                    t(player, "      &7[&f掉落物判定" + (success ? "&a成功" : "&c失败") + "&7] &f" + item);
+                }
+                if (success) {
                     double multipler = event.randomFortuneMultipler(fortune);
                     List<ItemStack> list = item.generateItems(player, multipler);
-                    if (list != null) {
+                    if (list != null && !list.isEmpty()) {
                         List<ItemStack> dropItems = new ArrayList<>();
                         if (toInv) {
                             for (ItemStack itemStack : list) {
@@ -193,6 +206,8 @@ public class EventsManager extends AbstractModule {
                                 world.dropItem(loc, dropItem);
                             }
                         }
+                    } else if (plugin.debug && player.isOp()) {
+                        t(player, "      生成的物品列表为空 &7(multipler=" + multipler + ")");
                     }
                     if (item.isEnd()) {
                         break;

@@ -18,6 +18,11 @@ public class DropMythic extends AbstractDropItem {
     }
 
     @Override
+    public String toString() {
+        return "mythic " + rate + " " + id + (end ? " end" : "");
+    }
+
+    @Override
     public List<ItemStack> getItems(Player player, int amount) {
         List<ItemStack> items = new ArrayList<>();
         IMythic mythic = SweetDrops.getInstance().getMythic();
