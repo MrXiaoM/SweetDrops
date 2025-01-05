@@ -2,6 +2,7 @@ package top.mrxiaom.sweet.drops.func;
 
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.SweetDrops;
@@ -58,6 +59,11 @@ public class PrefebManager extends AbstractModule {
                 }
             }
         }
+    }
+
+    @Nullable
+    public Prefeb get(String id) {
+        return prefebsById.get(id);
     }
 
     public static PrefebManager inst() {
