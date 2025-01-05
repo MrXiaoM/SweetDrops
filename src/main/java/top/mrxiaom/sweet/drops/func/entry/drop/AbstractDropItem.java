@@ -1,9 +1,8 @@
-package top.mrxiaom.sweet.drops.func.entry;
+package top.mrxiaom.sweet.drops.func.entry.drop;
 
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import top.mrxiaom.sweet.drops.func.entry.drop.IDropItem;
 
 import java.util.List;
 import java.util.Random;
@@ -33,6 +32,6 @@ public abstract class AbstractDropItem implements IDropItem {
     public List<ItemStack> generateItems(Player player, double multiple) {
         int i = amount.getMaximumInteger() - amount.getMinimumInteger() + 1;
         int finalAmount = amount.getMinimumInteger() + new Random().nextInt(i);
-        return generateItems(player, finalAmount);
+        return getItems(player, finalAmount);
     }
 }
