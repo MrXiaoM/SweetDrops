@@ -27,12 +27,19 @@ cancel:
   all: false
   # 如果概率判定成功，掉落了物品，是否取消原版掉落
   if-drop-any: false
-# 拥有此权限的玩家，额外掉落物将会自动放到背包
+# 拥有此权限的玩家，掉落物将会自动放到背包，注释则不使用此功能
 perm-to-inventory: sweet.drops.auto
+# 在物品带有什么附魔时，掉落物将会自动放到背包
+# 格式与 enchantments 相同
+enchantments-to-inventory:
+  - binding_curse
+# 背包满了以后，掉落物自动放入背包时，不在玩家附近掉落溢出物品，而是直接消失
+# 开启此选项，如果实际给予了玩家0个物品，将阻止命令列表执行
+overflow-disappear: false
 # 掉落物品设置，格式如下，其中<>为必选参数，[]为可选参数
-#   原版格式：          mc <概率> <物品ID> [数量] [end]
-#   预制体格式：        prefeb <概率> <预制体ID> [数量] [end]
-#   MythicMobs物品格式：mythic <概率> <物品ID> [数量] [end]
+#   原版格式：          mc <概率> <物品ID> [数量] [end]; [命令] [text]
+#   预制体格式：        prefeb <概率> <预制体ID> [数量] [end]; [命令] [text]
+#   MythicMobs物品格式：mythic <概率> <物品ID> [数量] [end]; [命令] [text]
 # 概率有两种格式
 #   小数格式：<数值>        比如 0.5 代表 50%
 #   百分比格式：<数值>%     比如 50%
@@ -40,8 +47,10 @@ perm-to-inventory: sweet.drops.auto
 #   固定数量：<数字>        比如 1
 #   随机数量：<下界>-<上界>  比如 1-5
 # 可选参数 end 如果填写，当此物品概率判定成功时，剩下的物品将会跳过概率判定，直接判为失败
+# 可选参数 命令 如果填写，当此物品概率判定成功时，执行 commands-pool 中对应的命令列表
+# 可选参数 text 如果填写，命令列表中 %text% 将会替换为这个值
 items:
-  - mc 0.1 netherite_ingot 1-5 end
+  - mc 0.1 netherite_ingot 1-5 end; example 下界合金锭
   - mc 0.1 gold_ingot 1-5
 # 时运设置
 fortune:
@@ -55,3 +64,12 @@ fortune:
     1: 1.0
     2: 1.0
     3: 1.0
+# 命令列表池
+# [console]控制台执行
+# [player]玩家执行
+# [message]聊天消息
+# 均支持 PAPI 变量。特殊地，%text% 变量请见上文，%amount% 代表获得的物品数量，%fortune% 代表时运等级
+# 命令列表池中可以添加多个不同名字的命令列表，用于 items 中调用
+commands-pool:
+  example:
+    - '[message]&e你在矿物中获得了 &b%text%&fx%amount%'

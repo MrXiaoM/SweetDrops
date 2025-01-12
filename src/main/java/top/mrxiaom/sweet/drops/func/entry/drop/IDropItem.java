@@ -10,4 +10,5 @@ public interface IDropItem {
     boolean isEnd();
     List<ItemStack> generateItems(Player player, double multiple);
     List<ItemStack> getItems(Player player, int amount);
+    void executeCommands(Player player, int itemAmount, int fortune);
 }

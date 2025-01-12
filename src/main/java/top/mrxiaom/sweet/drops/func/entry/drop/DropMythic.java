@@ -13,8 +13,8 @@ import static top.mrxiaom.sweet.drops.SweetDrops.format;
 
 public class DropMythic extends AbstractDropItem {
     public final String id;
-    public DropMythic(double rate, String id, IntRange amount, boolean end) {
-        super(rate, amount, end);
+    public DropMythic(double rate, String id, IntRange amount, boolean end, List<String> commands) {
+        super(rate, amount, end, commands);
         this.id = id;
     }
 

@@ -12,8 +12,8 @@ import static top.mrxiaom.sweet.drops.SweetDrops.format;
 
 public class DropVanilla extends AbstractDropItem {
     public final Material material;
-    public DropVanilla(double rate, Material material, IntRange amount, boolean end) {
-        super(rate, amount, end);
+    public DropVanilla(double rate, Material material, IntRange amount, boolean end, List<String> commands) {
+        super(rate, amount, end, commands);
         this.material = material;
     }
 

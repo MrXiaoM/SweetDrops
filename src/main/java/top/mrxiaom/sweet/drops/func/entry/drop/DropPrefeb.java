@@ -13,8 +13,8 @@ import static top.mrxiaom.sweet.drops.SweetDrops.format;
 
 public class DropPrefeb extends AbstractDropItem {
     public final String id;
-    public DropPrefeb(double rate, String id, IntRange amount, boolean end) {
-        super(rate, amount, end);
+    public DropPrefeb(double rate, String id, IntRange amount, boolean end, List<String> commands) {
+        super(rate, amount, end, commands);
         this.id = id;
     }
 

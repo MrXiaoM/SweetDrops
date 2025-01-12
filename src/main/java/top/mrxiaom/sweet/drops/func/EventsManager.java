@@ -158,7 +158,6 @@ public class EventsManager extends AbstractModule implements Listener {
                         if (entry.getKey().equalsIgnoreCase(key)) {
                             int requireLevel = entry.getValue();
                             match = requireLevel == 0 || enchant.getValue() >= requireLevel;
-
                             break;
                         }
                     }
@@ -181,25 +180,50 @@ public class EventsManager extends AbstractModule implements Listener {
                 e.setDropItems(false);
                 e.setExpToDrop(0);
             }
-            boolean toInv = event.needToInv(player);
+            boolean toInv = event.needToInv(player, mainHand);
             for (IDropItem item : event.items) {
                 boolean success = item.checkRate();
-
                 if (plugin.debug && player.isOp()) {
                     t(player, "      &7[&f掉落物判定" + (success ? "&a成功" : "&c失败") + "&7] &f" + item);
                 }
                 if (success) {
+                    boolean executeCommand = !event.overflowDisappear;
+                    int itemAmount = 0;
                     double multipler = event.randomFortuneMultipler(fortune);
                     List<ItemStack> list = item.generateItems(player, multipler);
                     if (list != null && !list.isEmpty()) {
                         List<ItemStack> dropItems = new ArrayList<>();
                         if (toInv) {
                             for (ItemStack itemStack : list) {
+                                if (itemStack.getType().equals(Material.AIR)) {
+                                    executeCommand = true;
+                                    continue;
+                                }
+                                int amount = itemStack.getAmount();
                                 Collection<ItemStack> last = inv.addItem(itemStack).values();
-                                dropItems.addAll(last);
+                                if (!last.isEmpty()) {
+                                    ItemStack next = last.iterator().next();
+                                    if (next.getAmount() < amount) {
+                                        executeCommand = true;
+                                        if (event.overflowDisappear) {
+                                            itemAmount += amount - next.getAmount();
+                                        }
+                                    } else if (!event.overflowDisappear) {
+                                        itemAmount += amount;
+                                    }
+                                } else {
+                                    itemAmount += amount;
+                                    executeCommand = true;
+                                }
+                                if (!event.overflowDisappear) {
+                                    dropItems.addAll(last);
+                                }
                             }
                         } else {
-                            dropItems.addAll(list);
+                            for (ItemStack itemStack : list) {
+                                if (itemStack.getType().equals(Material.AIR)) continue;
+                                dropItems.add(itemStack);
+                            }
                         }
                         if (!dropItems.isEmpty()) {
                             World world = block.getWorld();
@@ -210,6 +234,9 @@ public class EventsManager extends AbstractModule implements Listener {
                         }
                     } else if (plugin.debug && player.isOp()) {
                         t(player, "      生成的物品列表为空 &7(multipler=" + multipler + ")");
+                    }
+                    if (executeCommand) {
+                        item.executeCommands(player, itemAmount, fortune);
                     }
                     if (item.isEnd()) {
                         break;

@@ -4,6 +4,9 @@ import org.apache.commons.lang.math.DoubleRange;
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permissible;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.func.entry.drop.DropMythic;
@@ -26,30 +29,58 @@ public class Event {
     public final Set<String> worlds;
     public final Set<Material> blocks;
     public final List<IMatcher> tools;
-    public final Map<String, Integer> enchantments;
-    public final boolean cancelAll,cancelIfDropAny, requirePreferredTool;
+    public final Map<String, Integer> enchantments, enchantmentsToInventory;
+    public final boolean cancelAll, cancelIfDropAny, requirePreferredTool, overflowDisappear;
     public final String permToInventory;
     public final List<IDropItem> items;
     public final IRound fortuneRounding;
     public final Map<Integer, DoubleRange> fortuneMultiples;
 
-    Event(String id, Set<String> worlds, Set<Material> blocks, List<IMatcher> tools, Map<String, Integer> enchantments, boolean requirePreferredTool, boolean cancelAll, boolean cancelIfDropAny, String permToInventory, List<IDropItem> items, IRound fortuneRounding, Map<Integer, DoubleRange> fortuneMultiples) {
+    Event(String id, Set<String> worlds, Set<Material> blocks, List<IMatcher> tools,
+          Map<String, Integer> enchantments, Map<String, Integer> enchantmentsToInventory,
+          boolean requirePreferredTool, boolean cancelAll, boolean cancelIfDropAny, boolean overflowDisappear,
+          String permToInventory, List<IDropItem> items, IRound fortuneRounding,
+          Map<Integer, DoubleRange> fortuneMultiples
+    ) {
         this.id = id;
         this.worlds = worlds;
         this.blocks = blocks;
         this.tools = tools;
         this.enchantments = enchantments;
+        this.enchantmentsToInventory = enchantmentsToInventory;
         this.requirePreferredTool = requirePreferredTool;
         this.cancelAll = cancelAll;
         this.cancelIfDropAny = cancelIfDropAny;
+        this.overflowDisappear = overflowDisappear;
         this.permToInventory = permToInventory;
         this.items = items;
         this.fortuneRounding = fortuneRounding;
         this.fortuneMultiples = fortuneMultiples;
     }
 
-    public boolean needToInv(Permissible permissible) {
-        return permToInventory != null && permissible.hasPermission(permToInventory);
+    public boolean needToInv(Permissible permissible, ItemStack tool) {
+        boolean perm = permToInventory != null && permissible.hasPermission(permToInventory);
+        if (perm) return true;
+        ItemMeta meta = tool.getItemMeta();
+        if (enchantmentsToInventory.isEmpty() || meta == null) return false;
+        Map<Enchantment, Integer> enchants = meta.getEnchants();
+        boolean matchEnchant = true;
+        for (Map.Entry<String, Integer> entry : enchantmentsToInventory.entrySet()) {
+            boolean match = false;
+            for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
+                String key = enchant.getKey().getKey().getKey();
+                if (entry.getKey().equalsIgnoreCase(key)) {
+                    int requireLevel = entry.getValue();
+                    match = requireLevel == 0 || enchant.getValue() >= requireLevel;
+                    break;
+                }
+            }
+            if (!match) {
+                matchEnchant = false;
+                break;
+            }
+        }
+        return matchEnchant;
     }
 
     public double randomFortuneMultipler(int fortune) {
@@ -61,6 +92,7 @@ public class Event {
     }
 
     public static Event load(ConfigurationSection config, String id) {
+        ConfigurationSection section;
         Set<String> worlds = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         worlds.addAll(config.getStringList("worlds"));
         Set<Material> blocks = new TreeSet<>();
@@ -98,13 +130,28 @@ public class Event {
             int level = split.length == 1 ? 0 : Math.max(0, Util.parseInt(split[1]).orElse(0));
             enchantments.put(enchant, level);
         }
+        Map<String, Integer> enchantmentsToInventory = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (String s : config.getStringList("enchantments-to-inventory")) {
+            String[] split = s.split(":", 2);
+            String enchant = split[0];
+            int level = split.length == 1 ? 0 : Math.max(0, Util.parseInt(split[1]).orElse(0));
+            enchantmentsToInventory.put(enchant, level);
+        }
+        Map<String, List<String>> commandsPool = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        section = config.getConfigurationSection("commands-pool");
+        if (section != null) for (String key : section.getKeys(false)) {
+            List<String> commands = section.getStringList(key);
+            commandsPool.put(key, commands);
+        }
         boolean requirePreferredTool = config.getBoolean("require-preferred-tool", false),
                 cancelAll = config.getBoolean("cancel.all", false),
-                cancelIfDropAny = config.getBoolean("cancel.if-drop-any", false);
+                cancelIfDropAny = config.getBoolean("cancel.if-drop-any", false),
+                overflowDisappear = config.getBoolean("overflow-disappear", false);
         String permToInventory = config.getString("perm-to-inventory");
         List<IDropItem> items = new ArrayList<>();
         for (String s : config.getStringList("items")) {
-            String[] split = s.split(" ");
+            String[] split1 = s.split(";", 2);
+            String[] split = split1[0].split(" ");
             if (split.length < 3) continue;
             String type = split[0];
             String rateNum = split[1].replace("%", "");
@@ -115,19 +162,30 @@ public class Event {
             String item = split[2];
             IntRange amount = getIntRange(split.length >= 4 ? split[3] : null).orElseGet(() -> new IntRange(1));
             boolean end = split.length >= 5 && split[4].equals("end");
+            List<String> commands = new ArrayList<>();
+            if (split1.length == 2) {
+                String[] split2 = split1[1].trim().split(" ");
+                List<String> list = commandsPool.get(split2[0]);
+                if (list != null) {
+                    String text = split2.length >= 2 ? split2[1] : "";
+                    for (String str : list) {
+                        commands.add(str.replace("%text%", text));
+                    }
+                }
+            }
             if (type.equalsIgnoreCase("mc")) {
                 Material material = Util.valueOr(Material.class, item, null);
                 if (material != null) {
-                    items.add(new DropVanilla(rate, material, amount, end));
+                    items.add(new DropVanilla(rate, material, amount, end, commands));
                     continue;
                 }
             }
             if (type.equalsIgnoreCase("prefeb")) {
-                items.add(new DropPrefeb(rate, item, amount, end));
+                items.add(new DropPrefeb(rate, item, amount, end, commands));
                 continue;
             }
             if (type.equalsIgnoreCase("mythic")) {
-                items.add(new DropMythic(rate, item, amount, end));
+                items.add(new DropMythic(rate, item, amount, end, commands));
                 continue;
             }
         }
@@ -137,14 +195,17 @@ public class Event {
         else if (roundingType.equals("floor")) rounding = RoundFloor.INSTANCE;
         else rounding = RoundRound.INSTANCE;
         Map<Integer, DoubleRange> multiples = new HashMap<>();
-        ConfigurationSection section = config.getConfigurationSection("fortune.multiples");
+        section = config.getConfigurationSection("fortune.multiples");
         if (section != null) for (String key : section.getKeys(false)) {
             Integer level = Util.parseInt(key).orElse(null);
             if (level == null) continue;
             DoubleRange multipler = getDoubleRange(section.getString(key)).orElseGet(() -> new DoubleRange(1.0));
             multiples.put(level, multipler);
         }
-        return new Event(id, worlds, blocks, tools, enchantments, requirePreferredTool, cancelAll, cancelIfDropAny, permToInventory, items, rounding, multiples);
+        return new Event(id, worlds, blocks, tools,
+                enchantments, enchantmentsToInventory,
+                requirePreferredTool, cancelAll, cancelIfDropAny, overflowDisappear,
+                permToInventory, items, rounding, multiples);
     }
 
     public static Optional<IntRange> getIntRange(String s) {
