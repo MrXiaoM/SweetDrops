@@ -14,7 +14,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.drops.Messages;
 import top.mrxiaom.sweet.drops.SweetDrops;
 import top.mrxiaom.sweet.drops.func.AbstractModule;
 import top.mrxiaom.sweet.drops.func.PrefebManager;
@@ -32,25 +34,26 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
+        if (!sender.isOp()) return true;
+        if (args.length == 1 && "reload".equalsIgnoreCase(args[0])) {
             plugin.reloadConfig();
-            return t(sender, "&a配置文件已重载");
+            return Messages.commands__reload.tm(sender);
         }
-        if (args.length == 1 && "debug".equalsIgnoreCase(args[0]) && sender.isOp()) {
+        if (args.length == 1 && "debug".equalsIgnoreCase(args[0])) {
             plugin.debug = !plugin.debug;
-            return t(sender, "&f调试模式已" + (plugin.debug ? "&a开启" : "&c关闭"));
+            return (plugin.debug ? Messages.commands__debug__on : Messages.commands__debug__off).tm(sender);
         }
-        if (args.length >= 2 && "prefeb".equalsIgnoreCase(args[0]) && sender.isOp()) {
+        if (args.length >= 2 && "prefeb".equalsIgnoreCase(args[0])) {
             String id = args[1];
             Prefeb prefeb = PrefebManager.inst().get(id);
             if (prefeb == null) {
-                return t(sender, "&e找不到预制体 &b" + prefeb);
+                return Messages.commands__prefeb__notfound.tm(sender, prefeb);
             }
             int count;
             if (args.length >= 3) {
                 count = Util.parseInt(args[2]).orElse(0);
                 if (count <= 0) {
-                    return t(sender, "&e请输入正确的数量");
+                    return Messages.commands__prefeb__no_amount.tm(sender);
                 }
             } else {
                 count = 1;
@@ -59,11 +62,11 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (args.length >= 4) {
                 player = Util.getOnlinePlayer(args[3]).orElse(null);
                 if (player == null) {
-                    return t(sender, "&e玩家 &b" + args[3] + " &e不在线");
+                    return Messages.player__notfound.tm(sender, args[3]);
                 }
             }
             if (player == null) {
-                return t(sender, "&e该命令只能由玩家执行");
+                return Messages.player__only.tm(sender);
             }
             PlayerInventory inv = player.getInventory();
             List<ItemStack> items = DropPrefeb.getItems(player, prefeb, count);
@@ -79,9 +82,12 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                     world.dropItem(loc, dropItem);
                 }
             }
-            return t(sender, "&e已给予玩家 &b" + player + "&e 预制体 &b" + id + "&e 共 &b" + count + " &e个");
+            return Messages.commands__prefeb__given.tm(sender,
+                    Pair.of("%player%", player),
+                    Pair.of("%prefeb%", id),
+                    Pair.of("%count%", count));
         }
-        return true;
+        return Messages.commands__help.tm(sender);
     }
 
     private static final List<String> emptyList = Lists.newArrayList();

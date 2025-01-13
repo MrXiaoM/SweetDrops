@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.EconomyHolder;
+import top.mrxiaom.pluginbase.func.LanguageManager;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.mythic.IMythic;
 import top.mrxiaom.sweet.drops.mythic.Mythic4;
@@ -56,6 +57,9 @@ public class SweetDrops extends BukkitPlugin {
         } else {
             getLogger().info("未安装 MythicMobs");
         }
+        LanguageManager.inst()
+                .setLangFile("messages.yml")
+                .register(Messages.class, Messages::holder);
     }
 
     @Override
