@@ -36,7 +36,7 @@ dependencies {
     implementation("org.jetbrains:annotations:21.0.0")
     implementation("commons-lang:commons-lang:2.6")
     implementation("de.tr7zw:item-nbt-api:2.14.1")
-    implementation("top.mrxiaom:PluginBase:1.0.9")
+    implementation("top.mrxiaom:PluginBase:1.2.1")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
