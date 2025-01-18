@@ -218,6 +218,7 @@ public class EventsManager extends AbstractModule implements Listener {
                                 if (!event.overflowDisappear) {
                                     dropItems.addAll(last);
                                 }
+                                last.clear();
                             }
                         } else {
                             for (ItemStack itemStack : list) {
@@ -225,12 +226,14 @@ public class EventsManager extends AbstractModule implements Listener {
                                 dropItems.add(itemStack);
                             }
                         }
+                        list.clear();
                         if (!dropItems.isEmpty()) {
                             World world = block.getWorld();
                             Location loc = block.getLocation().clone().add(0, 0.5, 0);
                             for (ItemStack dropItem : dropItems) {
                                 world.dropItem(loc, dropItem);
                             }
+                            dropItems.clear();
                         }
                     } else if (plugin.debug && player.isOp()) {
                         t(player, "      生成的物品列表为空 &7(multipler=" + multipler + ")");
