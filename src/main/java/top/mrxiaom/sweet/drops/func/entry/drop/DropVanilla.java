@@ -24,6 +24,7 @@ public class DropVanilla extends AbstractDropItem {
 
     @Override
     public List<ItemStack> getItems(Player player, int amount) {
+        if (material.equals(Material.AIR)) return null;
         List<ItemStack> items = new ArrayList<>();
         int maxSize = material.getMaxStackSize();
         int current = amount;
