@@ -2,8 +2,9 @@ name: SweetDrops
 version: '${version}'
 main: top.mrxiaom.sweet.drops.SweetDrops
 api-version: 1.13
-depend: [ MythicMobs ]
-softdepend: [ PlaceholderAPI ]
+softdepend:
+  - PlaceholderAPI
+  - MythicMobs
 authors: [ MrXiaoM ]
 commands:
   sweetdrops:
