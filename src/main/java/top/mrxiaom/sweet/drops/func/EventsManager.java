@@ -101,7 +101,11 @@ public class EventsManager extends AbstractModule implements Listener {
         if (!supportKey) {
             return enchant.getName();
         }
-        return enchant.getKey().getKey();
+        try {
+            return enchant.getKey().getKey();
+        } catch (Throwable ignored) {
+            return enchant.getName();
+        }
     }
 
     private void cancelDrops(BlockBreakEvent e) {
