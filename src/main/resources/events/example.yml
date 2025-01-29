@@ -14,6 +14,8 @@ tools: []
 require-preferred-tool: false
 # 要求使用带有什么附魔的物品来挖掘，留空则不限制挖掘附魔
 # 格式为 附魔:等级 或 附魔，不输入等级的格式不限制等级
+# 1.13+ 使用原版的附魔ID，1.12.2 及以下请查阅以下链接
+# https://helpch.at/docs/1.12.2/org/bukkit/enchantments/Enchantment.html
 # 原版示例：
 #   要求锋利I     sharpness:1
 #   要求锋利      sharpness

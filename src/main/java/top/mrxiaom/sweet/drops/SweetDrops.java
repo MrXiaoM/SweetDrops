@@ -2,7 +2,6 @@ package top.mrxiaom.sweet.drops;
         
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;

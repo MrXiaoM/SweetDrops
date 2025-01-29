@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permissible;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.drops.func.EventsManager;
 import top.mrxiaom.sweet.drops.func.entry.drop.DropMythic;
 import top.mrxiaom.sweet.drops.func.entry.drop.DropPrefeb;
 import top.mrxiaom.sweet.drops.func.entry.drop.DropVanilla;
@@ -68,7 +69,7 @@ public class Event {
         for (Map.Entry<String, Integer> entry : enchantmentsToInventory.entrySet()) {
             boolean match = false;
             for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
-                String key = enchant.getKey().getKey().getKey();
+                String key = EventsManager.getKey(enchant.getKey());
                 if (entry.getKey().equalsIgnoreCase(key)) {
                     int requireLevel = entry.getValue();
                     match = requireLevel == 0 || enchant.getValue() >= requireLevel;

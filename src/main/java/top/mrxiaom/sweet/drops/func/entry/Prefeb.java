@@ -7,13 +7,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import top.mrxiaom.pluginbase.utils.AdventureItemStack;
 import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.SweetDrops;
+import top.mrxiaom.sweet.drops.func.EventsManager;
 import top.mrxiaom.sweet.drops.utils.Utils;
 
 import java.util.HashMap;
@@ -109,7 +109,7 @@ public class Prefeb {
             boolean flag = SweetDrops.isSupportNamespacedKeys();
             for (Enchantment enchant : Enchantment.values()) {
                 if (flag) {
-                    if (enchant.getKey().getKey().equalsIgnoreCase(key)) {
+                    if (EventsManager.getKey(enchant).equalsIgnoreCase(key)) {
                         enchantment = enchant;
                         break;
                     }

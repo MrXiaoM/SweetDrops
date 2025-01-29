@@ -1,9 +1,6 @@
 package top.mrxiaom.sweet.drops.func;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -31,9 +28,11 @@ import java.util.*;
 public class EventsManager extends AbstractModule implements Listener {
     final Map<String, Event> eventsById = new HashMap<>();
     final Map<String, Map<Material, List<Event>>> eventsByWorld = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private static boolean supportKey;
     public EventsManager(SweetDrops plugin) {
         super(plugin);
         registerEvents();
+        supportKey = Util.isPresent("org.bukkit.NamespacedKey");
     }
 
     @Override
@@ -98,6 +97,32 @@ public class EventsManager extends AbstractModule implements Listener {
         return map == null ? null : map.get(block.getType());
     }
 
+    public static String getKey(Enchantment enchant) {
+        if (!supportKey) {
+            return enchant.getName();
+        }
+        return enchant.getKey().getKey();
+    }
+
+    private void cancelDrops(BlockBreakEvent e) {
+        try {
+            e.setExpToDrop(0);
+            e.setDropItems(false);
+        } catch (Throwable ignored) {
+            e.setCancelled(true);
+            // TODO: 为低版本播放方块破坏音效
+            e.getBlock().setType(Material.AIR);
+        }
+    }
+
+    private boolean isPreferredTool(Block block, ItemStack item) {
+        try {
+            return block.isPreferredTool(item);
+        } catch (Throwable ignored) {
+            return true;
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
@@ -110,7 +135,7 @@ public class EventsManager extends AbstractModule implements Listener {
         PlayerInventory inv = player.getInventory();
         ItemStack mainHand = inv.getItemInHand();
         int fortune;
-        boolean preferredTool = block.isPreferredTool(mainHand);
+        boolean preferredTool = isPreferredTool(block, mainHand);
         if (preferredTool) {
             ItemMeta meta = mainHand.getItemMeta();
             if (meta != null) {
@@ -154,7 +179,7 @@ public class EventsManager extends AbstractModule implements Listener {
                 for (Map.Entry<String, Integer> entry : event.enchantments.entrySet()) {
                     boolean match = false;
                     for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
-                        String key = enchant.getKey().getKey().getKey();
+                        String key = getKey(enchant.getKey());
                         if (entry.getKey().equalsIgnoreCase(key)) {
                             int requireLevel = entry.getValue();
                             match = requireLevel == 0 || enchant.getValue() >= requireLevel;
@@ -177,8 +202,7 @@ public class EventsManager extends AbstractModule implements Listener {
                 t(player, "    &f一切条件&a匹配&f，正在进行判定");
             }
             if (event.cancelAll) {
-                e.setDropItems(false);
-                e.setExpToDrop(0);
+                cancelDrops(e);
             }
             boolean toInv = event.needToInv(player, mainHand);
             for (IDropItem item : event.items) {
