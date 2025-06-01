@@ -6,6 +6,7 @@ softdepend:
   - PlaceholderAPI
   - MythicMobs
 authors: [ MrXiaoM ]
+folia-supported: true
 commands:
   sweetdrops:
     description: 'The main command of SweetDrops'

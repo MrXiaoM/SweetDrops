@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.LanguageManager;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.drops.mythic.IMythic;
 import top.mrxiaom.sweet.drops.mythic.Mythic4;
 import top.mrxiaom.sweet.drops.mythic.Mythic5;
@@ -24,10 +25,11 @@ public class SweetDrops extends BukkitPlugin {
                 .reconnectDatabaseWhenReloadConfig(false)
                 .scanIgnore("top.mrxiaom.sweet.drops.libs")
         );
+        this.scheduler = new FoliaLibScheduler(this);
     }
     public static boolean debug = false;
     private static boolean supportNamespacedKeys = Util.isPresent("org.bukkit.NamespacedKey");
-    IMythic mythic;
+    private IMythic mythic;
 
     public static boolean isSupportNamespacedKeys() {
         return supportNamespacedKeys;

@@ -36,6 +36,7 @@ dependencies {
     implementation("org.jetbrains:annotations:21.0.0")
     implementation("commons-lang:commons-lang:2.6")
     implementation("de.tr7zw:item-nbt-api:2.15.0")
+    implementation("com.github.technicallycoded:FoliaLib:0.4.4")
     implementation("top.mrxiaom:PluginBase:1.4.5")
 }
 java {
@@ -51,6 +52,7 @@ tasks {
             "org.intellij.lang.annotations" to "annotations.intellij",
             "org.jetbrains.annotations" to "annotations.jetbrains",
             "top.mrxiaom.pluginbase" to "base",
+            "com.tcoded.folialib" to "folialib",
             "de.tr7zw.changeme.nbtapi" to "nbtapi",
             "org.apache.commons" to "commons",
             "net.kyori" to "kyori",
