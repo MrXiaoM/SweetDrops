@@ -66,7 +66,7 @@ public class Prefeb {
         }
         if (lore != null) {
             List<String> parsedLore = PAPI.setPlaceholders(player, lore);
-            AdventureItemStack.setItemLore(item, parsedLore);
+            AdventureItemStack.setItemLoreMiniMessage(item, parsedLore);
         }
         if (!nbtStrings.isEmpty() || !nbtInts.isEmpty() || unique) {
             NBT.modify(item, nbt -> {
