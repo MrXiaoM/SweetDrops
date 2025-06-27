@@ -30,14 +30,14 @@ dependencies {
     compileOnly("io.lumine:Mythic:5.6.2")
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
 
-    implementation("net.kyori:adventure-api:4.21.0")
+    implementation("net.kyori:adventure-api:4.23.0")
     implementation("net.kyori:adventure-platform-bukkit:4.4.0")
-    implementation("net.kyori:adventure-text-minimessage:4.21.0")
+    implementation("net.kyori:adventure-text-minimessage:4.23.0")
     implementation("org.jetbrains:annotations:21.0.0")
     implementation("commons-lang:commons-lang:2.6")
-    implementation("de.tr7zw:item-nbt-api:2.15.0")
+    implementation("de.tr7zw:item-nbt-api:2.15.1-SNAPSHOT")
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
-    implementation("top.mrxiaom:PluginBase:1.4.5")
+    implementation("top.mrxiaom:PluginBase:1.4.9")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
