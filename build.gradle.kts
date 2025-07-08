@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "top.mrxiaom.sweet.drops"
-version = "1.0.4"
+version = "1.0.5"
 val targetJavaVersion = 8
 val shadowGroup = "top.mrxiaom.sweet.drops.libs"
 
@@ -37,7 +37,7 @@ dependencies {
     implementation("commons-lang:commons-lang:2.6")
     implementation("de.tr7zw:item-nbt-api:2.15.1")
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
-    implementation("top.mrxiaom:PluginBase:1.5.1")
+    implementation("top.mrxiaom:PluginBase:1.5.3")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
