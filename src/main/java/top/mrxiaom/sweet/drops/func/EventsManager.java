@@ -202,6 +202,24 @@ public class EventsManager extends AbstractModule implements Listener {
                     continue;
                 }
             }
+            if (!event.bannedEnchantments.isEmpty()) {
+                boolean matchEnchant = false;
+                for (String enchant : event.bannedEnchantments) {
+                    for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+                        String key = getKey(entry.getKey());
+                        if (enchant.equalsIgnoreCase(key)) {
+                            if (plugin.debug && player.isOp()) {
+                                t(player, "    附魔存在匹配 &7(banned-enchantments)&f: " + key);
+                            }
+                            matchEnchant = true;
+                            break;
+                        }
+                    }
+                }
+                if (matchEnchant) {
+                    continue;
+                }
+            }
             if (plugin.debug && player.isOp()) {
                 t(player, "    &f一切条件&a匹配&f，正在进行判定");
             }

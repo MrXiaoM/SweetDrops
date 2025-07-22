@@ -31,6 +31,7 @@ public class Event {
     public final Set<Material> blocks;
     public final List<IMatcher> tools;
     public final Map<String, Integer> enchantments, enchantmentsToInventory;
+    public final Set<String> bannedEnchantments;
     public final boolean cancelAll, cancelIfDropAny, requirePreferredTool, overflowDisappear;
     public final String permToInventory;
     public final List<IDropItem> items;
@@ -39,6 +40,7 @@ public class Event {
 
     Event(String id, Set<String> worlds, Set<Material> blocks, List<IMatcher> tools,
           Map<String, Integer> enchantments, Map<String, Integer> enchantmentsToInventory,
+          Set<String> bannedEnchantments,
           boolean requirePreferredTool, boolean cancelAll, boolean cancelIfDropAny, boolean overflowDisappear,
           String permToInventory, List<IDropItem> items, IRound fortuneRounding,
           Map<Integer, DoubleRange> fortuneMultiples
@@ -49,6 +51,7 @@ public class Event {
         this.tools = tools;
         this.enchantments = enchantments;
         this.enchantmentsToInventory = enchantmentsToInventory;
+        this.bannedEnchantments = bannedEnchantments;
         this.requirePreferredTool = requirePreferredTool;
         this.cancelAll = cancelAll;
         this.cancelIfDropAny = cancelIfDropAny;
@@ -138,6 +141,8 @@ public class Event {
             int level = split.length == 1 ? 0 : Math.max(0, Util.parseInt(split[1]).orElse(0));
             enchantmentsToInventory.put(enchant, level);
         }
+        Set<String> bannedEnchantments = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        bannedEnchantments.addAll(config.getStringList("banned-enchantments"));
         Map<String, List<String>> commandsPool = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         section = config.getConfigurationSection("commands-pool");
         if (section != null) for (String key : section.getKeys(false)) {
@@ -204,7 +209,7 @@ public class Event {
             multiples.put(level, multipler);
         }
         return new Event(id, worlds, blocks, tools,
-                enchantments, enchantmentsToInventory,
+                enchantments, enchantmentsToInventory, bannedEnchantments,
                 requirePreferredTool, cancelAll, cancelIfDropAny, overflowDisappear,
                 permToInventory, items, rounding, multiples);
     }

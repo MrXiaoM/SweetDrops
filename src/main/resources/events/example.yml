@@ -23,6 +23,10 @@ require-preferred-tool: false
 #   要求保护光环I  aura:1
 #   要求保护光环   aura
 enchantments: []
+# 要求不能使用什么附魔的物品来挖掘，留空则不限制挖掘附魔
+# 这个选项与 enchantments 独立，只需要填写附魔，无需填写等级
+banned-enchantments:
+  - silk_touch
 # 掉落取消设置
 cancel:
   # 是否取消原版的全部掉落，不分情况
