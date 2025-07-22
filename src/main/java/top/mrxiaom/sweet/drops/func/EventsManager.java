@@ -10,9 +10,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
@@ -127,6 +129,11 @@ public class EventsManager extends AbstractModule implements Listener {
         }
     }
 
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent e) {
+        e.getBlock().setMetadata("SweetDrops_PlayerPlaced", new FixedMetadataValue(plugin, true));
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
@@ -134,6 +141,7 @@ public class EventsManager extends AbstractModule implements Listener {
         GameMode gameMode = player.getGameMode();
         if (!gameMode.equals(GameMode.SURVIVAL) && !gameMode.equals(GameMode.ADVENTURE)) return;
         Block block = e.getBlock();
+        if (block.hasMetadata("SweetDrops_PlayerPlaced")) return;
         List<Event> events = get(block);
         if (events == null) return;
         PlayerInventory inv = player.getInventory();
