@@ -35,9 +35,9 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.23.0")
     implementation("org.jetbrains:annotations:21.0.0")
     implementation("commons-lang:commons-lang:2.6")
-    implementation("de.tr7zw:item-nbt-api:2.15.1")
+    implementation("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT")
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
-    implementation("top.mrxiaom:PluginBase:1.5.3")
+    implementation("top.mrxiaom:PluginBase:1.5.5")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
