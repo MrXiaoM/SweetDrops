@@ -7,6 +7,8 @@ softdepend:
   - MythicMobs
 authors: [ MrXiaoM ]
 folia-supported: true
+libraries:
+  - "org.jetbrains:annotations:24.0.0"
 commands:
   sweetdrops:
     description: 'The main command of SweetDrops'
