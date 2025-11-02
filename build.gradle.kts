@@ -12,7 +12,7 @@ buildscript {
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.drops"
-version = "1.0.5"
+version = "1.0.6"
 val targetJavaVersion = 8
 val pluginBaseModules = listOf("library", "paper", "actions", "l10n")
 val pluginBaseVersion = "1.7.0"
