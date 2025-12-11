@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permissible;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.drops.SweetDrops;
 import top.mrxiaom.sweet.drops.func.EventsManager;
 import top.mrxiaom.sweet.drops.func.entry.drop.DropMythic;
 import top.mrxiaom.sweet.drops.func.entry.drop.DropPrefeb;
@@ -24,6 +25,7 @@ import top.mrxiaom.sweet.drops.func.entry.round.RoundFloor;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundRound;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Event {
     public final String id;
@@ -96,6 +98,7 @@ public class Event {
     }
 
     public static Event load(ConfigurationSection config, String id) {
+        Logger logger = SweetDrops.getInstance().getLogger();
         ConfigurationSection section;
         Set<String> worlds = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         worlds.addAll(config.getStringList("worlds"));
@@ -104,7 +107,9 @@ public class Event {
             Material material = Util.valueOr(Material.class, s, null);
             if (material != null) {
                 blocks.add(material);
+                continue;
             }
+            logger.warning("[" + id + "] blocks 输入的方块无效: " + s);
         }
         List<IMatcher> tools = new ArrayList<>();
         for (String s : config.getStringList("tools")) {
@@ -126,6 +131,7 @@ public class Event {
                 tools.add(new MatchVanilla(material));
                 continue;
             }
+            logger.warning("[" + id + "] tools 输入的工具无效: " + s);
         }
         Map<String, Integer> enchantments = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for (String s : config.getStringList("enchantments")) {
@@ -155,21 +161,29 @@ public class Event {
                 overflowDisappear = config.getBoolean("overflow-disappear", false);
         String permToInventory = config.getString("perm-to-inventory");
         List<IDropItem> items = new ArrayList<>();
-        for (String s : config.getStringList("items")) {
+        List<String> stringList = config.getStringList("items");
+        for (int i = 0; i < stringList.size(); i++) {
+            String s = stringList.get(i);
             String[] split1 = s.split(";", 2);
             String[] split = split1[0].split(" ");
-            if (split.length < 3) continue;
+            if (split.length < 3) {
+                logger.warning("[" + id + "] items[" + i + "] 的格式不正确，参数数量过少");
+                continue;
+            }
             String type = split[0];
             String rateNum = split[1].replace("%", "");
             Double rate = (split[1].endsWith("%")
                     ? Util.parseDouble(rateNum).map(it -> it / 100.0)
                     : Util.parseDouble(rateNum)).orElse(null);
-            if (rate == null) continue;
+            if (rate == null) {
+                logger.warning("[" + id + "] items[" + i + "] 指定的倍率格式不正确: " + split[1]);
+                continue;
+            }
             String item = split[2];
             IntRange amount = getIntRange(split.length >= 4 ? split[3] : null).orElseGet(() -> new IntRange(1));
             boolean end = split.length >= 5 && split[4].equals("end");
             List<String> commands = new ArrayList<>();
-            if (split1.length == 2) {
+            if (split1.length == 2 && !split[1].trim().isEmpty()) {
                 String[] split2 = split1[1].trim().split(" ");
                 List<String> list = commandsPool.get(split2[0]);
                 if (list != null) {
@@ -185,6 +199,8 @@ public class Event {
                     items.add(new DropVanilla(rate, material, amount, end, commands));
                     continue;
                 }
+                logger.warning("[" + id + "] items[" + i + "] 指定的原版物品不存在: " + item);
+                continue;
             }
             if (type.equalsIgnoreCase("prefeb")) {
                 items.add(new DropPrefeb(rate, item, amount, end, commands));
@@ -194,6 +210,7 @@ public class Event {
                 items.add(new DropMythic(rate, item, amount, end, commands));
                 continue;
             }
+            logger.warning("[" + id + "] items[" + i + "] 的格式不正确，未找到合适的物品提供器");
         }
         String roundingType = config.getString("fortune.rounding", "");
         IRound rounding;
@@ -204,8 +221,15 @@ public class Event {
         section = config.getConfigurationSection("fortune.multiples");
         if (section != null) for (String key : section.getKeys(false)) {
             Integer level = Util.parseInt(key).orElse(null);
-            if (level == null) continue;
-            DoubleRange multipler = getDoubleRange(section.getString(key)).orElseGet(() -> new DoubleRange(1.0));
+            if (level == null) {
+                logger.warning("[" + id + "] fortune.multiples 指定的等级 " + key + " 不正确");
+                continue;
+            }
+            String multipleStr = section.getString(key);
+            DoubleRange multipler = getDoubleRange(multipleStr).orElseGet(() -> {
+                logger.warning("[" + id + "] fortune.multiples." + level + " 指定的倍率 " + multipleStr + " 不正确");
+                return new DoubleRange(1.0);
+            });
             multiples.put(level, multipler);
         }
         return new Event(id, worlds, blocks, tools,
