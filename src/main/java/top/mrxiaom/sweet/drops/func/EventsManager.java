@@ -244,7 +244,7 @@ public class EventsManager extends AbstractModule implements Listener {
                     boolean executeCommand = !event.overflowDisappear;
                     int itemAmount = 0;
                     double multipler = event.randomFortuneMultipler(fortune);
-                    List<ItemStack> list = item.generateItems(player, multipler);
+                    List<ItemStack> list = item.generateItems(player, event, multipler);
                     if (list != null && !list.isEmpty()) {
                         List<ItemStack> dropItems = new ArrayList<>();
                         if (toInv) {

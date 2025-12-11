@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.pluginbase.utils.depend.PAPI;
+import top.mrxiaom.sweet.drops.func.entry.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,15 @@ public abstract class AbstractDropItem implements IDropItem {
 
     @Override
     public List<ItemStack> generateItems(Player player, double multiple) {
+        return generateItems(player, null, multiple);
+    }
+    @Override
+    public List<ItemStack> generateItems(Player player, Event event, double multiple) {
         int i = amount.getMaximumInteger() - amount.getMinimumInteger() + 1;
         int finalAmount = amount.getMinimumInteger() + new Random().nextInt(i);
+        if (multiple != 1.0 && event != null) {
+            finalAmount = event.fortuneRounding.process(finalAmount * multiple);
+        }
         return getItems(player, finalAmount);
     }
 

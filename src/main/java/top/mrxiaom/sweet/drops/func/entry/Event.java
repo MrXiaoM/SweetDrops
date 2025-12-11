@@ -92,6 +92,7 @@ public class Event {
     public double randomFortuneMultipler(int fortune) {
         DoubleRange range = fortuneMultiples.get(fortune);
         if (range == null) return 1.0;
+        if (range.getMinimumDouble() == range.getMaximumDouble()) return range.getMinimumDouble();
         double rand = new Random().nextInt(1919810) / 1919809.0;
         double len = range.getMaximumDouble() - range.getMinimumDouble();
         return range.getMinimumDouble() + rand * len;
