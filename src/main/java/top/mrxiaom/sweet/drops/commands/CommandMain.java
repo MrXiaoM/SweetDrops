@@ -47,7 +47,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             String id = args[1];
             Prefeb prefeb = PrefebManager.inst().get(id);
             if (prefeb == null) {
-                return Messages.commands__prefeb__notfound.tm(sender, prefeb);
+                return Messages.commands__prefeb__notfound.tmf(sender, prefeb);
             }
             int count;
             if (args.length >= 3) {
@@ -62,7 +62,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (args.length >= 4) {
                 player = Util.getOnlinePlayer(args[3]).orElse(null);
                 if (player == null) {
-                    return Messages.player__notfound.tm(sender, args[3]);
+                    return Messages.player__notfound.tmf(sender, args[3]);
                 }
             }
             if (player == null) {
