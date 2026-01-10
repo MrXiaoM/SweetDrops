@@ -2,12 +2,14 @@ package top.mrxiaom.sweet.drops;
         
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.LanguageManager;
 import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
 import top.mrxiaom.pluginbase.utils.ClassLoaderWrapper;
+import top.mrxiaom.pluginbase.utils.ConfigUtils;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.drops.mythic.IMythic;
@@ -39,6 +41,10 @@ public class SweetDrops extends BukkitPlugin {
                 : new File(this.getDataFolder(), "libraries");
         DefaultLibraryResolver resolver = new DefaultLibraryResolver(getLogger(), librariesDir);
 
+        YamlConfiguration overrideLibraries = ConfigUtils.load(resolve("./.override-libraries.yml"));
+        for (String key : overrideLibraries.getKeys(false)) {
+            resolver.getStartsReplacer().put(key, overrideLibraries.getString(key));
+        }
         resolver.addResolvedLibrary(BuildConstants.RESOLVED_LIBRARIES);
 
         List<URL> libraries = resolver.doResolve();
