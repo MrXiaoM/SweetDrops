@@ -1,6 +1,9 @@
 # 在哪些世界可用
-worlds:
+# 如果 worlds-whitelist 为空，则在所有世界可用
+# 在 worlds-blacklist 设置过的世界除外
+worlds-whitelist:
   - world
+worlds-blacklist: []
 # 挖掘哪种方块会触发掉落
 blocks:
   - BEDROCK

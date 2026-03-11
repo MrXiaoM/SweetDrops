@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
@@ -30,6 +31,7 @@ import java.util.*;
 public class EventsManager extends AbstractModule implements Listener {
     final Map<String, Event> eventsById = new HashMap<>();
     final Map<String, Map<Material, List<Event>>> eventsByWorld = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    final Map<Material, List<Event>> eventsWildCardWorld = new HashMap<>();
     private static boolean supportKey;
     public EventsManager(SweetDrops plugin) {
         super(plugin);
@@ -54,7 +56,21 @@ public class EventsManager extends AbstractModule implements Listener {
         eventsByWorld.clear();
         Set<Material> blocks = new TreeSet<>();
         for (Event event : eventsById.values()) {
-            for (String world : event.worlds) {
+            Set<String> whiteListWorlds = event.whiteListWorlds;
+            Set<String> blackListWorlds = event.blackListWorlds;
+            if (whiteListWorlds.isEmpty()) {
+                if (blackListWorlds.isEmpty()) continue;
+                for (Material block : event.blocks) {
+                    blocks.add(block);
+                    List<Event> list = eventsWildCardWorld.get(block);
+                    if (list == null) list = new ArrayList<>();
+                    list.add(event);
+                    eventsWildCardWorld.put(block, list);
+                }
+                continue;
+            }
+            for (String world : whiteListWorlds) {
+                if (blackListWorlds.contains(world)) continue;
                 Map<Material, List<Event>> map = eventsByWorld.get(world);
                 if (map == null) map = new TreeMap<>();
                 for (Material block : event.blocks) {
@@ -87,7 +103,7 @@ public class EventsManager extends AbstractModule implements Listener {
                     continue;
                 }
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-                Event loaded = Event.load(config, id);
+                Event loaded = Event.load(plugin, config, id);
                 eventsById.put(id, loaded);
             }
         }
@@ -95,8 +111,23 @@ public class EventsManager extends AbstractModule implements Listener {
 
     @Nullable
     public List<Event> get(Block block) {
+        Material type = block.getType();
+        List<Event> events = new ArrayList<>();
+        addEventsToList(block, events, eventsWildCardWorld.get(type));
         Map<Material, List<Event>> map = eventsByWorld.get(block.getWorld().getName());
-        return map == null ? null : map.get(block.getType());
+        if (map != null) {
+            addEventsToList(block, events, map.get(type));
+        }
+        return events.isEmpty() ? null : events;
+    }
+
+    private void addEventsToList(Block block, List<Event> destination, List<Event> list) {
+        if (list == null) return;
+        String world = block.getWorld().getName();
+        for (Event event : list) {
+            if (event.blackListWorlds.contains(world)) continue;
+            destination.add(event);
+        }
     }
 
     public static String getKey(Enchantment enchant) {
