@@ -4,7 +4,6 @@ import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.LanguageManager;
 import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
@@ -35,22 +34,27 @@ public class SweetDrops extends BukkitPlugin {
         );
         this.scheduler = new FoliaLibScheduler(this);
 
-        info("正在检查依赖库状态");
-        File librariesDir = ClassLoaderWrapper.isSupportLibraryLoader
-                ? new File("libraries")
-                : new File(this.getDataFolder(), "libraries");
-        DefaultLibraryResolver resolver = new DefaultLibraryResolver(getLogger(), librariesDir);
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            getDescription().getLibraries();
+        } catch (LinkageError ignored) {
+            info("正在检查依赖库状态");
+            File librariesDir = ClassLoaderWrapper.isSupportLibraryLoader
+                    ? new File("libraries")
+                    : new File(this.getDataFolder(), "libraries");
+            DefaultLibraryResolver resolver = new DefaultLibraryResolver(getLogger(), librariesDir);
 
-        YamlConfiguration overrideLibraries = ConfigUtils.load(resolve("./.override-libraries.yml"));
-        for (String key : overrideLibraries.getKeys(false)) {
-            resolver.getStartsReplacer().put(key, overrideLibraries.getString(key));
-        }
-        resolver.addResolvedLibrary(BuildConstants.RESOLVED_LIBRARIES);
+            YamlConfiguration overrideLibraries = ConfigUtils.load(resolve("./.override-libraries.yml"));
+            for (String key : overrideLibraries.getKeys(false)) {
+                resolver.getStartsReplacer().put(key, overrideLibraries.getString(key));
+            }
+            resolver.addResolvedLibrary(BuildConstants.RESOLVED_LIBRARIES);
 
-        List<URL> libraries = resolver.doResolve();
-        info("正在添加 " + libraries.size() + " 个依赖库到类加载器");
-        for (URL library : libraries) {
-            this.classLoader.addURL(library);
+            List<URL> libraries = resolver.doResolve();
+            info("正在添加 " + libraries.size() + " 个依赖库到类加载器");
+            for (URL library : libraries) {
+                this.classLoader.addURL(library);
+            }
         }
     }
     public static boolean debug = false;
