@@ -4,6 +4,14 @@
 worlds-whitelist:
   - world
 worlds-blacklist: []
+# 区域判定设置
+regions:
+  # 白名单区域，不为空时，仅在指定区域可用
+  whitelist: []
+  # 黑名单区域，在指定区域不可用
+  blacklist:
+    - from: '-10, 0, -10'
+      to: '10, 5, 10'
 # 挖掘哪种方块会触发掉落
 blocks:
   - BEDROCK

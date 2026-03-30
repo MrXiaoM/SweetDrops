@@ -3,11 +3,14 @@ package top.mrxiaom.sweet.drops.func.entry;
 import org.apache.commons.lang.math.DoubleRange;
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permissible;
+import top.mrxiaom.pluginbase.utils.ConfigUtils;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.drops.SweetDrops;
 import top.mrxiaom.sweet.drops.func.EventsManager;
@@ -23,14 +26,16 @@ import top.mrxiaom.sweet.drops.func.entry.round.IRound;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundCeil;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundFloor;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundRound;
+import top.mrxiaom.sweet.drops.utils.Region;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 public class Event {
     public final String id;
     public final Set<String> whiteListWorlds;
     public final Set<String> blackListWorlds;
+    public final List<Region> regionsWhiteList;
+    public final List<Region> regionsBlackList;
     public final Set<Material> blocks;
     public final List<IMatcher> tools;
     public final Map<String, Integer> enchantments, enchantmentsToInventory;
@@ -51,6 +56,25 @@ public class Event {
 
         this.blackListWorlds = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         this.blackListWorlds.addAll(config.getStringList("worlds-blacklist"));
+
+        this.regionsWhiteList = new ArrayList<>();
+        this.regionsBlackList = new ArrayList<>();
+        for (ConfigurationSection s1 : ConfigUtils.getSectionList(config, "regions.whitelist")) {
+            Region region = Region.load(s1);
+            if (region == null) {
+                plugin.warn("[" + id + "] regions.whitelist 中存在无效的区域");
+                continue;
+            }
+            this.regionsWhiteList.add(region);
+        }
+        for (ConfigurationSection s1 : ConfigUtils.getSectionList(config, "regions.blacklist")) {
+            Region region = Region.load(s1);
+            if (region == null) {
+                plugin.warn("[" + id + "] regions.blacklist 中存在无效的区域");
+                continue;
+            }
+            this.regionsBlackList.add(region);
+        }
 
         this.blocks = new TreeSet<>();
         for (String s : config.getStringList("blocks")) {
@@ -184,6 +208,29 @@ public class Event {
         }
         this.fortuneRounding = rounding;
         this.fortuneMultiples = multiples;
+    }
+
+    public boolean isRegionAllowed(Block block) {
+        World world = block.getWorld();
+        if (!regionsWhiteList.isEmpty()) {
+            boolean allow = false;
+            for (Region region : regionsWhiteList) {
+                if (region.isForWorld(world) && region.isInRegion(block)) {
+                    allow = true;
+                }
+            }
+            if (!allow) {
+                return false;
+            }
+        }
+        if (!regionsBlackList.isEmpty()) {
+            for (Region region : regionsBlackList) {
+                if (region.isForWorld(world) && region.isInRegion(block)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public boolean needToInv(Permissible permissible, ItemStack tool) {

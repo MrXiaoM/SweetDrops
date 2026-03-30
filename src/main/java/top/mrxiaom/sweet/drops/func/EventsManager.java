@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
@@ -130,6 +129,7 @@ public class EventsManager extends AbstractModule implements Listener {
         }
     }
 
+    @SuppressWarnings({"deprecation"})
     public static String getKey(Enchantment enchant) {
         if (!supportKey) {
             return enchant.getName();
@@ -166,6 +166,7 @@ public class EventsManager extends AbstractModule implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
+    @SuppressWarnings({"deprecation"})
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
         Player player = e.getPlayer();
@@ -189,17 +190,22 @@ public class EventsManager extends AbstractModule implements Listener {
         } else {
             fortune = 0;
         }
-        if (plugin.debug && player.isOp()) {
+        if (SweetDrops.debug && player.isOp()) {
             t(player, "[挖掘方块][" + block.getType() + "] 有事件 " + events.size() + " 个，时运等级: " + fortune);
         }
         ItemMeta meta = mainHand.getItemMeta();
         Map<Enchantment, Integer> enchants = meta == null ? null : meta.getEnchants();
         for (Event event : events) {
-            if (plugin.debug && player.isOp()) {
+            if (SweetDrops.debug && player.isOp()) {
                 t(player, "  处理事件 " + event.id);
             }
+            if (!event.isRegionAllowed(block)) {
+                if (SweetDrops.debug && player.isOp()) {
+                    t(player, "    方块不在事件允许的区域内 &7(regions)");
+                }
+            }
             if (event.requirePreferredTool && !preferredTool) {
-                if (plugin.debug && player.isOp()) {
+                if (SweetDrops.debug && player.isOp()) {
                     t(player, "    工具不合适 &7(require-preferred-tool)");
                 }
                 continue;
@@ -212,7 +218,7 @@ public class EventsManager extends AbstractModule implements Listener {
                 }
             }
             if (!matchTool) {
-                if (plugin.debug && player.isOp()) {
+                if (SweetDrops.debug && player.isOp()) {
                     t(player, "    工具不匹配 &7(tools)");
                 }
                 continue;
@@ -221,16 +227,18 @@ public class EventsManager extends AbstractModule implements Listener {
                 boolean matchEnchant = true;
                 for (Map.Entry<String, Integer> entry : event.enchantments.entrySet()) {
                     boolean match = false;
-                    for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
-                        String key = getKey(enchant.getKey());
-                        if (entry.getKey().equalsIgnoreCase(key)) {
-                            int requireLevel = entry.getValue();
-                            match = requireLevel == 0 || enchant.getValue() >= requireLevel;
-                            break;
+                    if (enchants != null) {
+                        for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
+                            String key = getKey(enchant.getKey());
+                            if (entry.getKey().equalsIgnoreCase(key)) {
+                                int requireLevel = entry.getValue();
+                                match = requireLevel == 0 || enchant.getValue() >= requireLevel;
+                                break;
+                            }
                         }
                     }
                     if (!match) {
-                        if (plugin.debug && player.isOp()) {
+                        if (SweetDrops.debug && player.isOp()) {
                             t(player, "    附魔不匹配 &7(enchantments)&f: " + entry.getKey());
                         }
                         matchEnchant = false;
@@ -241,13 +249,13 @@ public class EventsManager extends AbstractModule implements Listener {
                     continue;
                 }
             }
-            if (!event.bannedEnchantments.isEmpty()) {
+            if (!event.bannedEnchantments.isEmpty() && enchants != null) {
                 boolean matchEnchant = false;
                 for (String enchant : event.bannedEnchantments) {
                     for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
                         String key = getKey(entry.getKey());
                         if (enchant.equalsIgnoreCase(key)) {
-                            if (plugin.debug && player.isOp()) {
+                            if (SweetDrops.debug && player.isOp()) {
                                 t(player, "    附魔存在匹配 &7(banned-enchantments)&f: " + key);
                             }
                             matchEnchant = true;
@@ -259,7 +267,7 @@ public class EventsManager extends AbstractModule implements Listener {
                     continue;
                 }
             }
-            if (plugin.debug && player.isOp()) {
+            if (SweetDrops.debug && player.isOp()) {
                 t(player, "    &f一切条件&a匹配&f，正在进行判定");
             }
             if (event.cancelAll) {
@@ -268,7 +276,7 @@ public class EventsManager extends AbstractModule implements Listener {
             boolean toInv = event.needToInv(player, mainHand);
             for (IDropItem item : event.items) {
                 boolean success = item.checkRate();
-                if (plugin.debug && player.isOp()) {
+                if (SweetDrops.debug && player.isOp()) {
                     t(player, "      &7[&f掉落物判定" + (success ? "&a成功" : "&c失败") + "&7] &f" + item);
                 }
                 if (success) {
@@ -323,7 +331,7 @@ public class EventsManager extends AbstractModule implements Listener {
                             dropItems.clear();
                             dropItems = null;
                         }
-                    } else if (plugin.debug && player.isOp()) {
+                    } else if (SweetDrops.debug && player.isOp()) {
                         t(player, "      生成的物品列表为空 &7(multipler=" + multipler + ")");
                     }
                     if (executeCommand) {
