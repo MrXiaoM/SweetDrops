@@ -26,6 +26,7 @@ import top.mrxiaom.sweet.drops.func.entry.round.IRound;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundCeil;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundFloor;
 import top.mrxiaom.sweet.drops.func.entry.round.RoundRound;
+import top.mrxiaom.sweet.drops.mythic.IMythic;
 import top.mrxiaom.sweet.drops.utils.Region;
 
 import java.util.*;
@@ -85,11 +86,12 @@ public class Event {
             }
             plugin.warn("[" + id + "] blocks 输入的方块无效: " + s);
         }
+        IMythic mythic = plugin.getMythic();
         this.tools = new ArrayList<>();
         for (String s : config.getStringList("tools")) {
-            if (s.startsWith("mythic:")) {
+            if (s.startsWith("mythic:") && mythic != null) {
                 String mythicItem = s.substring(7);
-                tools.add(new MatchMythic(mythicItem));
+                tools.add(new MatchMythic(mythic, mythicItem));
                 continue;
             }
             if (s.startsWith("mmo:")) {
