@@ -45,7 +45,7 @@ dependencies {
     base.library("commons-lang:commons-lang:2.6")
     base.collectPluginHolders()
 
-    implementation("de.tr7zw:item-nbt-api:2.16.0")
+    implementation("de.tr7zw:item-nbt-api:2.16.1")
     for (artifact in pluginBaseModules) {
         implementation(artifact)
     }
